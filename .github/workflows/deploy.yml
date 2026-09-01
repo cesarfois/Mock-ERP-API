@@ -20,6 +20,8 @@ jobs:
           key: ${{ secrets.CONTABO_SSH_KEY }}
           port: 22
           script: |
+            set -e
+            
             # Navegar para o diretório de deploy
             cd ${{ secrets.DEPLOY_PATH }}
             
