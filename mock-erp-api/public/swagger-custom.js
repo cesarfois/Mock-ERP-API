@@ -1,32 +1,27 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // Polling because swagger ui might take a moment to render the topbar
-    const checkExist = setInterval(function() {
-        const topbar = document.querySelector('.topbar-wrapper');
-        if (topbar) {
-            clearInterval(checkExist);
-            
-            const btn = document.createElement('a');
-            btn.href = '/';
-            btn.innerHTML = '← Voltar para Aplicação';
-            btn.style.color = '#fff';
-            btn.style.textDecoration = 'none';
-            btn.style.padding = '8px 16px';
-            btn.style.backgroundColor = '#2563eb';
-            btn.style.borderRadius = '4px';
-            btn.style.fontWeight = 'bold';
-            btn.style.fontFamily = 'sans-serif';
-            btn.style.marginLeft = '20px';
-            btn.style.display = 'inline-block';
-            btn.style.transition = 'background-color 0.2s';
-            
-            btn.onmouseover = function() {
-                this.style.backgroundColor = '#1d4ed8';
-            };
-            btn.onmouseout = function() {
-                this.style.backgroundColor = '#2563eb';
-            };
-            
-            topbar.appendChild(btn);
-        }
-    }, 100);
+    // Create a custom header
+    const header = document.createElement('div');
+    header.className = 'custom-header';
+
+    // Title area
+    const titleArea = document.createElement('div');
+    titleArea.className = 'custom-header-title';
+    titleArea.innerHTML = '<h1>Mock ERP / Primavera</h1><p>Documentação Técnica da API</p>';
+
+    // Back button
+    const backBtn = document.createElement('a');
+    backBtn.href = '/';
+    backBtn.className = 'custom-header-back-btn';
+    backBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+        </svg>
+        Voltar para o Painel
+    `;
+
+    header.appendChild(titleArea);
+    header.appendChild(backBtn);
+
+    // Insert the header at the very top of the body
+    document.body.insertBefore(header, document.body.firstChild);
 });

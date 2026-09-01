@@ -1,0 +1,80 @@
+/* Hide the default swagger topbar completely */
+.topbar {
+    display: none !important;
+}
+
+/* Add some padding to the swagger-ui container to make room for our custom header if needed, but flex takes care of it */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f3f4f6;
+}
+
+#swagger-ui {
+    background-color: #fff;
+    max-width: 1400px;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+}
+
+/* Custom Header styling */
+.custom-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1.25rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    font-family: 'Inter', sans-serif;
+}
+
+.custom-header-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.custom-header-title h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.custom-header-title p {
+    margin: 0;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.custom-header-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.custom-header-back-btn:hover {
+    background-color: #f9fafb;
+    color: #111827;
+    border-color: #9ca3af;
+}
+
+.custom-header-back-btn svg {
+    width: 16px;
+    height: 16px;
+}

@@ -38,6 +38,7 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customJs: '/swagger-custom.js',
+  customCssUrl: '/swagger-custom.css',
   customSiteTitle: "Mock ERP API Docs"
 }));
 
