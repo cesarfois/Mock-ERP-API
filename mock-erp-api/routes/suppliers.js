@@ -71,6 +71,30 @@ router.get('/', suppliersController.getSuppliers);
 
 /**
  * @swagger
+ * /api/v1/suppliers/clear:
+ *   post:
+ *     summary: Clear all suppliers but keep the sequence counter
+ *     tags: [Suppliers]
+ *     responses:
+ *       200:
+ *         description: Suppliers cleared
+ */
+router.post('/clear', suppliersController.clearSuppliers);
+
+/**
+ * @swagger
+ * /api/v1/suppliers/reset:
+ *   post:
+ *     summary: Reset environment (clear suppliers and sequence counter)
+ *     tags: [Suppliers]
+ *     responses:
+ *       200:
+ *         description: Environment reset
+ */
+router.post('/reset', suppliersController.resetEnvironment);
+
+/**
+ * @swagger
  * /api/v1/suppliers/{code}:
  *   get:
  *     summary: Get a supplier by ERP Code
@@ -87,7 +111,23 @@ router.get('/', suppliersController.getSuppliers);
  *         description: The supplier description by code
  *       404:
  *         description: Supplier not found
+ *   delete:
+ *     summary: Delete a supplier by ERP Code
+ *     tags: [Suppliers]
+ *     parameters:
+ *       - in: path
+ *         name: code
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The supplier ERP Code
+ *     responses:
+ *       200:
+ *         description: Supplier deleted
+ *       404:
+ *         description: Supplier not found
  */
 router.get('/:code', suppliersController.getSupplierByCode);
+router.delete('/:code', suppliersController.deleteSupplier);
 
 module.exports = router;

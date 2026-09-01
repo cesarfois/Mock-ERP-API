@@ -25,7 +25,7 @@ exports.createSupplier = (req, res) => {
     }
 
     // Generate new code
-    const erpCode = dataService.generateSupplierCode(db.suppliers);
+    const erpCode = dataService.generateSupplierCode(db);
     
     // Build supplier object
     const newSupplier = {
@@ -59,7 +59,8 @@ exports.getSuppliers = (req, res) => {
     return res.status(200).json({
       success: true,
       total: db.suppliers.length,
-      suppliers: db.suppliers
+      suppliers: db.suppliers,
+      lastSequence: db.lastSequence || 0
     });
   } catch (error) {
     console.error('Error fetching suppliers:', error);
@@ -87,6 +88,60 @@ exports.getSupplierByCode = (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching supplier:', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+exports.deleteSupplier = (req, res) => {
+  try {
+    const { code } = req.params;
+    const db = dataService.readDB();
+    
+    const index = db.suppliers.findIndex(s => s.erpCode === code || s.code === code);
+    
+    if (index === -1) {
+      return res.status(404).json({
+        success: false,
+        message: 'Supplier not found'
+      });
+    }
+
+    db.suppliers.splice(index, 1);
+    dataService.writeDB(db);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Fornecedor removido com sucesso',
+      erpCode: code
+    });
+  } catch (error) {
+    console.error('Error deleting supplier:', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+exports.clearSuppliers = (req, res) => {
+  try {
+    dataService.clearSuppliers();
+    return res.status(200).json({
+      success: true,
+      message: 'Lista de fornecedores limpa com sucesso'
+    });
+  } catch (error) {
+    console.error('Error clearing suppliers:', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+exports.resetEnvironment = (req, res) => {
+  try {
+    dataService.resetEnvironment();
+    return res.status(200).json({
+      success: true,
+      message: 'Ambiente de teste resetado com sucesso'
+    });
+  } catch (error) {
+    console.error('Error resetting environment:', error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };

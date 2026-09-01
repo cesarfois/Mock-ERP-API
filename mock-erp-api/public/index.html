@@ -1,182 +1,412 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mock ERP API - Fornecedores</title>
+    <title>Mock ERP / Primavera - Simulador</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f4f7f6;
-            --text-color: #333;
-            --primary-color: #007bff;
-            --header-bg: #fff;
-            --table-header-bg: #e9ecef;
-            --border-color: #dee2e6;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #dc2626;
+            --danger-hover: #b91c1c;
+            --warning: #f59e0b;
+            --warning-hover: #d97706;
+            --success: #10b981;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); -webkit-font-smoothing: antialiased; }
 
-        body {
-            font-family: 'Inter', 'Roboto', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            padding: 20px;
-        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: var(--header-bg);
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+        /* Header */
+        header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; }
+        .header-title h1 { font-size: 1.75rem; font-weight: 700; color: #111827; }
+        .header-title p { color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem; }
+        
+        .header-actions { display: flex; gap: 1rem; }
+        .btn { padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 500; font-size: 0.9rem; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-danger:hover { background-color: var(--danger-hover); }
+        .btn-warning { background-color: var(--warning); color: white; }
+        .btn-warning:hover { background-color: var(--warning-hover); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { background-color: #f9fafb; }
+        .btn-icon { padding: 0.4rem; background: transparent; color: var(--text-muted); border: none; cursor: pointer; border-radius: 4px; }
+        .btn-icon:hover { background: #f3f4f6; color: var(--text-main); }
+        .btn-icon.delete:hover { color: var(--danger); background: #fee2e2; }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-        }
+        /* Stats Cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--card-bg); padding: 1.5rem; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        .stat-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: #111827; }
 
-        h1 {
-            font-size: 24px;
-            color: var(--primary-color);
-        }
+        /* Main Content area */
+        .content-card { background: var(--card-bg); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); overflow: hidden; }
+        
+        .toolbar { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .search-box { position: relative; width: 350px; }
+        .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .search-box input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+        .search-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
 
-        .links a {
-            text-decoration: none;
-            color: #fff;
-            background-color: var(--primary-color);
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
+        /* Table */
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 1rem 1.5rem; font-size: 0.9rem; }
+        th { background-color: #f9fafb; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
+        td { border-bottom: 1px solid var(--border); color: var(--text-main); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: #f9fafb; }
+        
+        .code-badge { background: #eff6ff; color: #1e40af; padding: 0.2rem 0.6rem; border-radius: 4px; font-family: monospace; font-weight: 600; font-size: 0.85rem; }
+        
+        /* Status Badges */
+        .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.025em; }
+        .badge-cadastrado { background-color: #d1fae5; color: #065f46; }
+        .badge-erro { background-color: #fee2e2; color: #991b1b; }
+        .badge-pendente { background-color: #fef3c7; color: #92400e; }
+        .badge-inativo { background-color: #f3f4f6; color: #374151; }
 
-        .links a:hover {
-            background-color: #0056b3;
-        }
+        .actions { display: flex; gap: 0.5rem; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
+        /* Empty State */
+        .empty-state { padding: 4rem 2rem; text-align: center; }
+        .empty-icon { font-size: 3rem; color: #d1d5db; margin-bottom: 1rem; }
+        .empty-title { font-size: 1.2rem; font-weight: 600; color: #111827; margin-bottom: 0.5rem; }
+        .empty-desc { color: var(--text-muted); max-width: 400px; margin: 0 auto; }
 
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; visibility: hidden; transition: all 0.2s; backdrop-filter: blur(2px); }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal { background: var(--card-bg); border-radius: 12px; width: 90%; max-width: 600px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); transform: translateY(20px); transition: transform 0.3s; max-height: 90vh; display: flex; flex-direction: column; }
+        .modal-overlay.active .modal { transform: translateY(0); }
+        
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 1.25rem; font-weight: 600; }
+        .modal-close { background: none; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer; }
+        .modal-close:hover { color: var(--text-main); }
+        
+        .modal-body { padding: 1.5rem; overflow-y: auto; }
+        .modal-footer { padding: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 1rem; background: #f9fafb; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
 
-        th {
-            background-color: var(--table-header-bg);
-            font-weight: 600;
-        }
-
-        tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .status-badge {
-            background-color: #28a745;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-        }
+        /* Details Grid inside modal */
+        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        .detail-item { display: flex; flex-direction: column; gap: 0.25rem; }
+        .detail-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+        .detail-value { font-size: 0.95rem; font-weight: 500; color: #111827; }
+        .detail-full { grid-column: 1 / -1; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Mock ERP / Primavera API</h1>
-            <div class="links">
-                <a href="/docs" target="_blank">Ver Documentação Swagger</a>
+            <div class="header-title">
+                <h1>Mock ERP / Primavera</h1>
+                <p>Simulador de integração ERP</p>
+            </div>
+            <div class="header-actions">
+                <a href="/docs" target="_blank" class="btn btn-outline"><i class="fa-solid fa-book"></i> Documentação da API</a>
+                <button onclick="openClearModal('clear')" class="btn btn-warning"><i class="fa-solid fa-eraser"></i> Limpar Fornecedores</button>
+                <button onclick="openClearModal('reset')" class="btn btn-danger"><i class="fa-solid fa-triangle-exclamation"></i> Resetar Ambiente</button>
             </div>
         </header>
 
-        <h2>Fornecedores Cadastrados</h2>
-        
-        <table id="suppliersTable">
-            <thead>
-                <tr>
-                    <th>Código ERP</th>
-                    <th>NIF</th>
-                    <th>Nome Fiscal / Nome</th>
-                    <th>Tipo</th>
-                    <th>Estado</th>
-                    <th>Data Cadastro</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Rows will be injected here via JavaScript -->
-            </tbody>
-        </table>
-        
-        <div id="emptyState" class="empty-state" style="display: none;">
-            Nenhum fornecedor cadastrado ainda.
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">Total de Fornecedores</div>
+                <div class="stat-value" id="statTotal">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Último Código Gerado</div>
+                <div class="stat-value"><span class="code-badge" id="statLastCode">-</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Último Cadastro Realizado</div>
+                <div class="stat-value" style="font-size: 1.1rem; margin-top: 0.4rem;" id="statLastDate">-</div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="toolbar">
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Pesquisar por Código, NIF, Nome ou Nº Documento..." onkeyup="filterTable()">
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="suppliersTable">
+                    <thead>
+                        <tr>
+                            <th>Código ERP</th>
+                            <th>Nº Documento</th>
+                            <th>NIF</th>
+                            <th>Nome</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>País</th>
+                            <th>Data/Hora Cadastro</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Rows injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <i class="fa-solid fa-inbox empty-icon"></i>
+                <h3 class="empty-title">Nenhum fornecedor cadastrado</h3>
+                <p class="empty-desc">Os fornecedores recebidos através da integração com o DocuWare aparecerão aqui automaticamente.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal-overlay" id="detailsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Detalhes do Fornecedor</h2>
+                <button class="modal-close" onclick="closeModal('detailsModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="details-grid" id="detailsContainer">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('detailsModal')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Action Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal" style="max-width: 450px;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="confirmTitle">Confirmar Ação</h2>
+                <button class="modal-close" onclick="closeModal('confirmModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage" style="color: var(--text-main); font-size: 0.95rem;"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('confirmModal')">Cancelar</button>
+                <button class="btn btn-danger" id="confirmBtn">Confirmar</button>
+            </div>
         </div>
     </div>
 
     <script>
+        let allSuppliers = [];
+        let currentAction = null; // { type: 'delete', code: 'C001' } | { type: 'clear' } | { type: 'reset' }
+
+        function formatDate(isoString) {
+            if (!isoString) return '-';
+            const date = new Date(isoString);
+            return date.toLocaleString('pt-PT', { 
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+        }
+
+        function getStatusBadge(statusStr) {
+            const status = (statusStr || 'Cadastrado').toLowerCase();
+            let badgeClass = 'badge-cadastrado';
+            if (status.includes('erro')) badgeClass = 'badge-erro';
+            else if (status.includes('pendent')) badgeClass = 'badge-pendente';
+            else if (status.includes('inativ')) badgeClass = 'badge-inativo';
+            return `<span class="badge ${badgeClass}">${statusStr || 'Cadastrado'}</span>`;
+        }
+
         async function fetchSuppliers() {
             try {
                 const response = await fetch('/api/v1/suppliers');
                 const data = await response.json();
                 
-                const tbody = document.querySelector('#suppliersTable tbody');
-                const emptyState = document.getElementById('emptyState');
-                
-                if (data.success && data.suppliers && data.suppliers.length > 0) {
-                    emptyState.style.display = 'none';
-                    tbody.innerHTML = ''; // Clear current rows
-                    
-                    data.suppliers.forEach(supplier => {
-                        const tr = document.createElement('tr');
-                        
-                        const dateStr = supplier.createdAt ? new Date(supplier.createdAt).toLocaleDateString('pt-PT') : '-';
-                        const code = supplier.erpCode || supplier.code || '-';
-                        const name = supplier.name || supplier.fiscalName || '-';
-                        const type = supplier.supplierType || '-';
-                        const status = supplier.status || 'Cadastrado';
-
-                        tr.innerHTML = `
-                            <td><strong>${code}</strong></td>
-                            <td>${supplier.nif || '-'}</td>
-                            <td>${name}</td>
-                            <td>${type}</td>
-                            <td><span class="status-badge">${status}</span></td>
-                            <td>${dateStr}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                } else {
-                    emptyState.style.display = 'block';
+                if (data.success) {
+                    allSuppliers = data.suppliers.reverse(); // Newest first
+                    updateDashboard(data.lastSequence);
+                    renderTable();
                 }
             } catch (error) {
                 console.error('Error fetching suppliers:', error);
-                document.getElementById('emptyState').innerText = 'Erro ao carregar os dados.';
-                document.getElementById('emptyState').style.display = 'block';
             }
         }
 
-        // Fetch on load
+        function updateDashboard(lastSequence) {
+            document.getElementById('statTotal').innerText = allSuppliers.length;
+            
+            const lastCode = lastSequence > 0 ? `C${lastSequence.toString().padStart(3, '0')}` : '-';
+            document.getElementById('statLastCode').innerText = lastCode;
+
+            if (allSuppliers.length > 0) {
+                document.getElementById('statLastDate').innerText = formatDate(allSuppliers[0].createdAt);
+            } else {
+                document.getElementById('statLastDate').innerText = '-';
+            }
+        }
+
+        function renderTable(suppliersToRender = allSuppliers) {
+            const tbody = document.getElementById('tableBody');
+            const table = document.getElementById('suppliersTable');
+            const emptyState = document.getElementById('emptyState');
+            
+            tbody.innerHTML = '';
+            
+            if (suppliersToRender.length === 0) {
+                table.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            table.style.display = 'table';
+            emptyState.style.display = 'none';
+
+            suppliersToRender.forEach(supplier => {
+                const code = supplier.erpCode || supplier.code || '-';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="code-badge">${code}</span></td>
+                    <td>${supplier.documentNumber || '-'}</td>
+                    <td>${supplier.nif || '-'}</td>
+                    <td style="font-weight: 500;">${supplier.name || supplier.fiscalName || '-'}</td>
+                    <td>${supplier.supplierType || '-'}</td>
+                    <td>${getStatusBadge(supplier.status)}</td>
+                    <td>${supplier.country || '-'}</td>
+                    <td>${formatDate(supplier.createdAt)}</td>
+                    <td class="actions">
+                        <button class="btn-icon" onclick="viewSupplier('${code}')" title="Visualizar"><i class="fa-solid fa-eye"></i></button>
+                        <button class="btn-icon delete" onclick="confirmDelete('${code}', '${supplier.name || supplier.fiscalName || ''}')" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterTable() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allSuppliers.filter(s => {
+                const code = (s.erpCode || s.code || '').toLowerCase();
+                const nif = (s.nif || '').toLowerCase();
+                const name = (s.name || s.fiscalName || '').toLowerCase();
+                const doc = (s.documentNumber || '').toLowerCase();
+                return code.includes(query) || nif.includes(query) || name.includes(query) || doc.includes(query);
+            });
+            renderTable(filtered);
+        }
+
+        // Modals logic
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function viewSupplier(code) {
+            const supplier = allSuppliers.find(s => (s.erpCode === code || s.code === code));
+            if (!supplier) return;
+
+            const grid = document.getElementById('detailsContainer');
+            grid.innerHTML = `
+                <div class="detail-item"><span class="detail-label">Código ERP</span><span class="detail-value code-badge" style="align-self: flex-start;">${code}</span></div>
+                <div class="detail-item"><span class="detail-label">Nº Documento</span><span class="detail-value">${supplier.documentNumber || '-'}</span></div>
+                <div class="detail-item detail-full"><span class="detail-label">Nome / Nome Fiscal</span><span class="detail-value">${supplier.name || supplier.fiscalName || '-'}</span></div>
+                <div class="detail-item"><span class="detail-label">NIF</span><span class="detail-value">${supplier.nif || '-'}</span></div>
+                <div class="detail-item"><span class="detail-label">Tipo de Fornecedor</span><span class="detail-value">${supplier.supplierType || '-'}</span></div>
+                <div class="detail-item detail-full"><span class="detail-label">Email</span><span class="detail-value">${supplier.email || '-'}</span></div>
+                <div class="detail-item detail-full"><span class="detail-label">IBAN</span><span class="detail-value">${supplier.iban || '-'}</span></div>
+                <div class="detail-item"><span class="detail-label">Requerente</span><span class="detail-value">${supplier.requester || '-'}</span></div>
+                <div class="detail-item"><span class="detail-label">Estado</span><span class="detail-value">${getStatusBadge(supplier.status)}</span></div>
+                <div class="detail-item"><span class="detail-label">Regime de IVA</span><span class="detail-value">${supplier.vatRegime || '-'}</span></div>
+                <div class="detail-item"><span class="detail-label">País</span><span class="detail-value">${supplier.country || '-'}</span></div>
+                <div class="detail-item"><span class="detail-label">Data Documento</span><span class="detail-value">${supplier.documentDate ? new Date(supplier.documentDate).toLocaleDateString('pt-PT') : '-'}</span></div>
+                <div class="detail-item"><span class="detail-label">Data/Hora Cadastro (Sistema)</span><span class="detail-value">${formatDate(supplier.createdAt)}</span></div>
+            `;
+            openModal('detailsModal');
+        }
+
+        function confirmDelete(code, name) {
+            currentAction = { type: 'delete', code: code };
+            document.getElementById('confirmTitle').innerText = 'Excluir Fornecedor';
+            document.getElementById('confirmMessage').innerHTML = `Tem certeza que deseja excluir o fornecedor <strong>${code} - ${name}</strong>?`;
+            
+            const btn = document.getElementById('confirmBtn');
+            btn.innerText = 'Excluir';
+            btn.className = 'btn btn-danger';
+            btn.onclick = executeAction;
+            
+            openModal('confirmModal');
+        }
+
+        function openClearModal(type) {
+            currentAction = { type: type };
+            if (type === 'clear') {
+                document.getElementById('confirmTitle').innerText = 'Limpar Fornecedores';
+                document.getElementById('confirmMessage').innerHTML = `Esta ação removerá todos os fornecedores cadastrados. O contador de códigos <strong>será mantido</strong>.<br><br>Deseja continuar?`;
+                const btn = document.getElementById('confirmBtn');
+                btn.innerText = 'Limpar Fornecedores';
+                btn.className = 'btn btn-warning';
+                btn.onclick = executeAction;
+            } else {
+                document.getElementById('confirmTitle').innerText = 'Resetar Ambiente';
+                document.getElementById('confirmMessage').innerHTML = `Esta ação removerá todos os fornecedores e <strong>zerará o contador de códigos ERP</strong>.<br><br>Deseja continuar?`;
+                const btn = document.getElementById('confirmBtn');
+                btn.innerText = 'Resetar Ambiente';
+                btn.className = 'btn btn-danger';
+                btn.onclick = executeAction;
+            }
+            openModal('confirmModal');
+        }
+
+        async function executeAction() {
+            const btn = document.getElementById('confirmBtn');
+            const originalText = btn.innerText;
+            btn.innerText = 'Aguarde...';
+            btn.disabled = true;
+
+            try {
+                let url = '';
+                let method = '';
+                
+                if (currentAction.type === 'delete') {
+                    url = `/api/v1/suppliers/${currentAction.code}`;
+                    method = 'DELETE';
+                } else if (currentAction.type === 'clear') {
+                    url = `/api/v1/suppliers/clear`;
+                    method = 'POST';
+                } else if (currentAction.type === 'reset') {
+                    url = `/api/v1/suppliers/reset`;
+                    method = 'POST';
+                }
+
+                const res = await fetch(url, { method: method });
+                const data = await res.json();
+                
+                if (data.success) {
+                    closeModal('confirmModal');
+                    fetchSuppliers(); // Refresh table
+                } else {
+                    alert('Erro: ' + (data.message || 'Falha ao executar ação'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erro de comunicação com o servidor.');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Init
         fetchSuppliers();
     </script>
 </body>
