@@ -22,11 +22,15 @@ A API ficará disponível na porta **8081**:
 - **Swagger UI:** `http://localhost:8081/docs`
 
 ## Ambiente Contabo e Deploy Automático
-O ambiente de produção (simulador) está hospedado numa VPS da **Contabo**.
-O deploy é automatizado através de **GitHub Actions**. Qualquer `push` para a *branch* `main` irá acionar o pipeline.
+O ambiente de produção (simulador) está hospedado numa VPS da **Contabo** e está acessível de forma segura via HTTPS através do proxy reverso.
 
-### Porta Utilizada
-O serviço expõe a porta **`8081`** externamente.
+### URLs de Produção
+- **Interface Web:** `https://wp.processcloud.app/primavera/`
+- **Swagger UI:** `https://wp.processcloud.app/primavera/docs/`
+- **Health Check:** `https://wp.processcloud.app/primavera/health`
+- **API Endpoint:** `https://wp.processcloud.app/primavera/api/v1/suppliers`
+
+*(O serviço expõe internamente a porta **`8081`** que é consumida pelo Nginx).*
 
 ### Variáveis Secretas (GitHub Secrets)
 Para o deploy funcionar, configure os seguintes secrets no seu repositório GitHub (`Settings > Secrets and variables > Actions`):
