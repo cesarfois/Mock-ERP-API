@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock ERP API - Fornecedores</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --primary-color: #007bff;
+            --header-bg: #fff;
+            --table-header-bg: #e9ecef;
+            --border-color: #dee2e6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--header-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .links a {
+            text-decoration: none;
+            color: #fff;
+            background-color: var(--primary-color);
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .links a:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--table-header-bg);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Mock ERP / Primavera API</h1>
+            <div class="links">
+                <a href="/docs" target="_blank">Ver Documentação Swagger</a>
+            </div>
+        </header>
+
+        <h2>Fornecedores Cadastrados</h2>
+        
+        <table id="suppliersTable">
+            <thead>
+                <tr>
+                    <th>Código ERP</th>
+                    <th>NIF</th>
+                    <th>Nome Fiscal / Nome</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th>Data Cadastro</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be injected here via JavaScript -->
+            </tbody>
+        </table>
+        
+        <div id="emptyState" class="empty-state" style="display: none;">
+            Nenhum fornecedor cadastrado ainda.
+        </div>
+    </div>
+
+    <script>
+        async function fetchSuppliers() {
+            try {
+                const response = await fetch('/api/v1/suppliers');
+                const data = await response.json();
+                
+                const tbody = document.querySelector('#suppliersTable tbody');
+                const emptyState = document.getElementById('emptyState');
+                
+                if (data.success && data.suppliers && data.suppliers.length > 0) {
+                    emptyState.style.display = 'none';
+                    tbody.innerHTML = ''; // Clear current rows
+                    
+                    data.suppliers.forEach(supplier => {
+                        const tr = document.createElement('tr');
+                        
+                        const dateStr = supplier.createdAt ? new Date(supplier.createdAt).toLocaleDateString('pt-PT') : '-';
+                        const code = supplier.erpCode || supplier.code || '-';
+                        const name = supplier.name || supplier.fiscalName || '-';
+                        const type = supplier.supplierType || '-';
+                        const status = supplier.status || 'Cadastrado';
+
+                        tr.innerHTML = `
+                            <td><strong>${code}</strong></td>
+                            <td>${supplier.nif || '-'}</td>
+                            <td>${name}</td>
+                            <td>${type}</td>
+                            <td><span class="status-badge">${status}</span></td>
+                            <td>${dateStr}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    emptyState.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error fetching suppliers:', error);
+                document.getElementById('emptyState').innerText = 'Erro ao carregar os dados.';
+                document.getElementById('emptyState').style.display = 'block';
+            }
+        }
+
+        // Fetch on load
+        fetchSuppliers();
+    </script>
+</body>
+</html>

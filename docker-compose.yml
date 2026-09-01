@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mock-erp-api:
+    build: 
+      context: ./mock-erp-api
+      dockerfile: Dockerfile
+    container_name: mock-erp-api
+    ports:
+      - "8080:3000" # Exposing on port 8080 of the host machine
+    environment:
+      - PORT=3000
+    volumes:
+      - mock_erp_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  mock_erp_data:
+    name: mock_erp_data
