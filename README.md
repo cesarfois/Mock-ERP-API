@@ -63,3 +63,6 @@ Você pode reiniciar exclusivamente este container sem impactar o resto da infra
 ```bash
 docker restart mock-erp-api
 ```
+
+---
+*Deploy automatizado via GitHub Actions configurado e ativo.*
