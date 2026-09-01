@@ -10,7 +10,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Back button
     const backBtn = document.createElement('a');
-    backBtn.href = '/';
+    backBtn.href = 'javascript:void(0)';
+    backBtn.onclick = function() { window.location.href = window.location.pathname.replace(/\/docs\/?$/, '/'); };
     backBtn.className = 'custom-header-back-btn';
     backBtn.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">

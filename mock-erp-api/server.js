@@ -29,7 +29,17 @@ const swaggerOptions = {
       title: 'Mock ERP / Primavera API',
       version: '1.0.0',
       description: 'API for simulating ERP operations (e.g. Primavera)',
-    }
+    },
+    servers: [
+      {
+        url: '/primavera',
+        description: 'Produção (Contabo VPS)'
+      },
+      {
+        url: '/',
+        description: 'Servidor Local / Base'
+      }
+    ]
   },
   apis: ['./routes/*.js'],
 };

@@ -117,7 +117,7 @@
                 <p>Simulador de integração ERP</p>
             </div>
             <div class="header-actions">
-                <a href="/docs" target="_blank" class="btn btn-outline"><i class="fa-solid fa-book"></i> Documentação da API</a>
+                <a href="docs/" target="_blank" class="btn btn-outline"><i class="fa-solid fa-book"></i> Documentação da API</a>
                 <button onclick="openClearModal('clear')" class="btn btn-warning"><i class="fa-solid fa-eraser"></i> Limpar Fornecedores</button>
                 <button onclick="openClearModal('reset')" class="btn btn-danger"><i class="fa-solid fa-triangle-exclamation"></i> Resetar Ambiente</button>
             </div>
@@ -232,7 +232,7 @@
 
         async function fetchSuppliers() {
             try {
-                const response = await fetch('/api/v1/suppliers');
+                const response = await fetch('./api/v1/suppliers');
                 const data = await response.json();
                 
                 if (data.success) {
@@ -378,13 +378,13 @@
                 let method = '';
                 
                 if (currentAction.type === 'delete') {
-                    url = `/api/v1/suppliers/${currentAction.code}`;
+                    url = `./api/v1/suppliers/${currentAction.code}`;
                     method = 'DELETE';
                 } else if (currentAction.type === 'clear') {
-                    url = `/api/v1/suppliers/clear`;
+                    url = `./api/v1/suppliers/clear`;
                     method = 'POST';
                 } else if (currentAction.type === 'reset') {
-                    url = `/api/v1/suppliers/reset`;
+                    url = `./api/v1/suppliers/reset`;
                     method = 'POST';
                 }
 
