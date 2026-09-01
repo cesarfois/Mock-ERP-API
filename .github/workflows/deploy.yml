@@ -1,0 +1,46 @@
+name: Deploy to Contabo
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.CONTABO_HOST }}
+          username: ${{ secrets.CONTABO_USER }}
+          key: ${{ secrets.CONTABO_SSH_KEY }}
+          port: ${{ secrets.CONTABO_PORT }}
+          script: |
+            # Navegar para o diretório de deploy
+            cd ${{ secrets.DEPLOY_PATH }}
+            
+            # Puxar código atualizado
+            git pull origin main
+            
+            # Fazer o build apenas do Mock ERP e recriá-lo em modo detached
+            docker compose build mock-erp-api
+            docker compose up -d mock-erp-api
+            
+            echo "Aguardando 10 segundos para a API iniciar..."
+            sleep 10
+            
+            # Validar o health check
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8081/health || echo "Failed")
+            
+            if [ "$HTTP_STATUS" -ne 200 ]; then
+              echo "Health check falhou! Código HTTP: $HTTP_STATUS"
+              echo "Exibindo logs recentes do container:"
+              docker logs --tail 50 mock-erp-api
+              exit 1
+            fi
+            
+            echo "Deploy concluído com sucesso e Health Check validado (HTTP 200)."

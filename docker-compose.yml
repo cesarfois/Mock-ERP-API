@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: mock-erp-api
     ports:
-      - "8080:3000" # Exposing on port 8080 of the host machine
+      - "8081:3000" # Exposing on port 8081 of the host machine
     environment:
       - PORT=3000
     volumes:

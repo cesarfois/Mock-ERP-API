@@ -4,3 +4,6 @@ data/
 mock_erp_data/
 *.log
 .DS_Store
+.env
+.env.*
+.DS_Store

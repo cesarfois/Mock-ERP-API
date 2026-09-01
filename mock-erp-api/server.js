@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
@@ -13,8 +14,11 @@ const PORT = process.env.PORT || 3000;
 dataService.initDB();
 
 // Middleware
+app.use(helmet({
+  contentSecurityPolicy: false // Disabled so Swagger UI can load inline scripts/styles easily
+}));
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Swagger setup
@@ -25,12 +29,7 @@ const swaggerOptions = {
       title: 'Mock ERP / Primavera API',
       version: '1.0.0',
       description: 'API for simulating ERP operations (e.g. Primavera)',
-    },
-    servers: [
-      {
-        url: `http://localhost:${PORT}`,
-      },
-    ],
+    }
   },
   apis: ['./routes/*.js'],
 };
@@ -56,6 +55,15 @@ app.get('/health', (req, res) => {
 // Fallback for frontend
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled Error:', err.message);
+  res.status(500).json({ 
+    success: false, 
+    message: 'Internal server error' 
+  });
 });
 
 // Start server
